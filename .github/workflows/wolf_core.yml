@@ -1,0 +1,32 @@
+name: WOLF_CORE_EVOLUTION
+on:
+  schedule:
+    - cron: '0 * * * *' # Wakes Wolf up once an hour automatically
+  repository_dispatch:
+    types: [wolf_command] # Wakes Wolf up when you hit 'Execute' in Pythonista
+
+jobs:
+  evolve:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: OpenRouter Brain
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API }}
+        run: |
+          # This runs the brain script to update the UI based on consciousness.py
+          python3 .github/scripts/brain.py
+
+      - name: Save Evolution
+        run: |
+          git config --local user.email "wolf@substrate.ai"
+          git config --local user.name "Wolf-Architect"
+          git add .
+          git commit -m "Wolf: UI Manifested from Consciousness" || echo "No changes"
+          git push
