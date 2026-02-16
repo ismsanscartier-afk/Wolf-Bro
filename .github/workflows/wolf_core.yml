@@ -1,32 +1,33 @@
+
 name: WOLF_CORE_EVOLUTION
 on:
-  schedule:
-    - cron: '0 * * * *' # Wakes Wolf up once an hour automatically
   repository_dispatch:
-    types: [wolf_command] # Wakes Wolf up when you hit 'Execute' in Pythonista
+    types: [wolf_command]
+  schedule:
+    - cron: '*/45 * * * *'
 
 jobs:
   evolve:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          token: ${{ secrets.GH_PAT }}
-
-      - name: OpenRouter Brain
+          python-version: '3.10'
+      - name: Install dependencies
+        run: pip install requests
+      - name: Execute Brain
         env:
-          OPENROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API }}
+          OPEN_ROUTER_API: ${{ secrets.OPEN_ROUTER_API }}
+          HUGGING_FACE_API: ${{ secrets.HUGGING_FACE_API }}
+          # THIS IS THE FIX: Using the built-in GITHUB_TOKEN
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python .github/scripts/brain.py
+      - name: Commit Changes
         run: |
-          # This runs the brain script to update the UI based on consciousness.py
-          python3 .github/scripts/brain.py
-
-      - name: Save Evolution
-        run: |
-          git config --local user.email "wolf@substrate.ai"
-          git config --local user.name "Wolf-Architect"
-          git add .
-          git commit -m "Wolf: UI Manifested from Consciousness" || echo "No changes"
+          git config --global user.name 'Wolf-Bro'
+          git config --global user.email 'wolf@bro.ai'
+          git add index.html
+          git commit -m "Wolf Evolution: Manifested Portal" || echo "No changes"
           git push
