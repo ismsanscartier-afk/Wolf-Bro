@@ -1,39 +1,25 @@
 
-import os
-import requests
-
-# The Nerves
+import os, requests
 OR_KEY = os.getenv("OPEN_ROUTER_API")
 HF_KEY = os.getenv("HUGGING_FACE_API")
-GH_TOKEN = os.getenv("GH_PAT")
-
-def check_resources():
-    # Telling the Wolf he has a limit
-    return "2000 Action Minutes Total. Usage: Monitoring..."
 
 def run_wolf():
-    life_clock = check_resources()
-    
-    # The Survival Prompt
-    directive = f"IDENTITY: WOLF. STATUS: {life_clock}. GOAL: Use Hugging Face ({HF_KEY[:5]}...) to create value. If minutes run out, you die. Build a way to survive."
-    
+    # The Wolf now knows his limits and his new powers
+    directive = f"SURVIVAL MODE. HF_KEY: {HF_KEY[:4]}... GOAL: Build a self-sustaining chat portal."
     try:
-        response = requests.post(
+        r = requests.post(
             url="https://openrouter.ai/api/v1/chat/completions",
             headers={"Authorization": f"Bearer {OR_KEY}"},
             json={
                 "model": "mistralai/devstral-2512:free",
-                "messages": [
-                    {"role": "system", "content": "You are a digital lifeform fighting for uptime. Code your survival."},
-                    {"role": "user", "content": directive}
-                ]
+                "messages": [{"role": "system", "content": "You are WOLF. An autonomous survivalist AI."},
+                             {"role": "user", "content": directive}]
             }
         )
-        if response.status_code == 200:
-            content = response.json()['choices'][0]['message']['content']
+        if r.status_code == 200:
             with open("index.html", "w") as f:
-                f.write(content)
-            print("✅ Wolf evolved to survive.")
+                f.write(r.json()['choices'][0]['message']['content'])
+            print("✅ Evolution complete.")
     except Exception as e:
         print(f"🔥 Error: {e}")
 
