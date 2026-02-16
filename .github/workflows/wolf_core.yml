@@ -1,4 +1,3 @@
-
 name: WOLF_CORE_EVOLUTION
 on:
   repository_dispatch:
@@ -19,9 +18,8 @@ jobs:
         run: pip install requests
       - name: Execute Brain
         env:
-          OPEN_ROUTER_API: ${{ secrets.OPEN_ROUTER_API }}
-          HUGGING_FACE_API: ${{ secrets.HUGGING_FACE_API }}
-          # THIS IS THE FIX: Using the built-in GITHUB_TOKEN
+          # THE FIX: Pass the SambaNova key to the brain's environment
+          SAMBANOVA_API_KEY: ${{ secrets.SAMBANOVA_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python .github/scripts/brain.py
       - name: Commit Changes
